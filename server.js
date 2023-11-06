@@ -66,6 +66,14 @@ app.post('/login', passport.authenticate('local', {failureRedirect: '/register',
 app.get('/profile', isAuthenticated, (req, res) => {
     res.send(req.user);
 });
+app.get('/logout', (req, res) => {
+    req.logout(function(err) {
+        if (err) {
+            console.error(err);
+        }
+        res.redirect('/');
+    });
+});
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
