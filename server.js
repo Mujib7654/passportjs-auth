@@ -4,6 +4,8 @@ const {connectMongoose} = require('./config/database');
 const {User} = require('./models/userSchema');
 const passport = require('passport');
 const {initializingPassport} = require('./config/passport');
+const {isAuthenticated} = require('./middleware/auth');
+const expressSession = require('express-session');
 
 const app = express();
 
@@ -16,6 +18,14 @@ initializingPassport(passport);
 //middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+//middleware to use passportjs
+app.use(expressSession({
+    secret:'secret',  //this is a random string that will be used to sign the session id cookie
+    resave: false,
+    saveUninitialized: false })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 //view engine ejs
 app.set('view engine', 'ejs');
@@ -49,7 +59,13 @@ app.post('/register', async(req, res) => {
         console.log(error);
     }
     
-})
+});
+//login
+app.post('/login', passport.authenticate('local', {failureRedirect: '/register', successRedirect: '/profile'}))
+
+app.get('/profile', isAuthenticated, (req, res) => {
+    res.send(req.user);
+});
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
