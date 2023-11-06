@@ -2,11 +2,16 @@ const express = require('express');
 const ejs = require('ejs');
 const {connectMongoose} = require('./config/database');
 const {User} = require('./models/userSchema');
+const passport = require('passport');
+const {initializingPassport} = require('./config/passport');
 
 const app = express();
 
 //db call
 connectMongoose();
+
+//passport fn call
+initializingPassport(passport);
 
 //middleware
 app.use(express.json());
